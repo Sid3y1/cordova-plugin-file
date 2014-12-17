@@ -154,7 +154,14 @@ public class ContentFilesystem extends Filesystem {
 			throws NoModificationAllowedException {
 		throw new NoModificationAllowedException("Cannot remove content url");
 	}
-
+    	@Override
+        public JSONArray readFilteredEntriesAtLocalURL(LocalFilesystemURL inputURL,JSONObject options)
+	                  throws FileNotFoundException {
+		return null;
+	}
+		
+		  
+	    
 	@Override
 	public JSONArray readEntriesAtLocalURL(LocalFilesystemURL inputURL)
 			throws FileNotFoundException {
