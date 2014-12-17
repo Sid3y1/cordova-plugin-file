@@ -473,6 +473,15 @@ public class FileUtils extends CordovaPlugin {
                 }
             },callbackContext);
         }
+	else if (action.equals("readFilteredEntries")) { //SIDMODIF
+            final String fname=args.getString(0);
+            threadhelper( new FileOp( ){
+                public void run() throws FileNotFoundException, JSONException, MalformedURLException {
+                    JSONArray entries = readFilteredEntries(fname,args.optJSONObject(1));
+                    callbackContext.success(entries);
+                }
+            },callbackContext);
+        }
         else if (action.equals("readEntries")) {
             final String fname=args.getString(0);
             threadhelper( new FileOp( ){
@@ -630,7 +639,30 @@ public class FileUtils extends CordovaPlugin {
         	throw new MalformedURLException("Unrecognized filesystem URL");
         }
     }   
-    
+     
+    /**
+     * Read the list of files from this directory with a filter.
+     *
+     * @param fileName the directory to read from
+     * @return a JSONArray containing JSONObjects that represent Entry objects.
+     * @throws FileNotFoundException if the directory is not found.
+     * @throws JSONException
+     * @throws MalformedURLException 
+     */
+    private JSONArray readFilteredEntries(String baseURLstr, JSONObject options) throws FileNotFoundException, JSONException, MalformedURLException {
+        try {
+        	LocalFilesystemURL inputURL = new LocalFilesystemURL(baseURLstr);
+        	Filesystem fs = this.filesystemForURL(inputURL);
+        	if (fs == null) {
+        		throw new MalformedURLException("No installed handlers for this URL");
+        	}
+        	return fs.readFilteredEntriesAtLocalURL(inputURL,options);
+        
+        } catch (IllegalArgumentException e) {
+        	throw new MalformedURLException("Unrecognized filesystem URL");
+        }
+    }
+
     /**
      * Read the list of files from this directory.
      *

@@ -31,6 +31,46 @@ function DirectoryReader(localURL) {
 }
 
 /**
+ * Returns a list of entries from a directory with a filter.
+ *
+ * @param {Function} successCallback is called with a list of entries
+ * @param {Function} errorCallback is called with a FileError
+ * @param JSONObject options Filters
+ */
+DirectoryReader.prototype.readFilteredEntries = function(successCallback, errorCallback,options) {
+    // If we've already read and passed on this directory's entries, return an empty list.
+    if (this.hasReadEntries) {
+        successCallback([]);
+        return;
+    }
+    var reader = this;
+    var win = typeof successCallback !== 'function' ? null : function(result) {
+        var retVal = [];
+        for (var i=0; i<result.length; i++) {
+            var entry = null;
+            if (result[i].isDirectory) {
+                entry = new (require('./DirectoryEntry'))();
+            }
+            else if (result[i].isFile) {
+                entry = new (require('./FileEntry'))();
+            }
+            entry.isDirectory = result[i].isDirectory;
+            entry.isFile = result[i].isFile;
+            entry.name = result[i].name;
+            entry.fullPath = result[i].fullPath;
+            entry.filesystem = new (require('./FileSystem'))(result[i].filesystemName);
+            entry.nativeURL = result[i].nativeURL;
+            retVal.push(entry);
+        }
+        reader.hasReadEntries = true;
+        successCallback(retVal);
+    };
+    var fail = typeof errorCallback !== 'function' ? null : function(code) {
+        errorCallback(new FileError(code));
+    };
+    exec(win, fail, "File", "readFilteredEntries", [this.localURL,options]);
+}
+/**
  * Returns a list of entries from a directory.
  *
  * @param {Function} successCallback is called with a list of entries
@@ -67,7 +107,7 @@ DirectoryReader.prototype.readEntries = function(successCallback, errorCallback)
     var fail = typeof errorCallback !== 'function' ? null : function(code) {
         errorCallback(new FileError(code));
     };
-    exec(win, fail, "File", "readEntries", [this.localURL]);
+    exec(win, fail, "File", "readFilteredEntries", [this.localURL]);
 };
 
 module.exports = DirectoryReader;

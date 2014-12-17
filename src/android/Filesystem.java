@@ -36,7 +36,7 @@ public abstract class Filesystem {
 	public interface ReadFileCallback {
 		public void handleData(InputStream inputStream, String contentType) throws IOException;
 	}
-
+	
 	public static JSONObject makeEntryForPath(String path, String fsName, Boolean isDir, String nativeURL)
 			throws JSONException {
         JSONObject entry = new JSONObject();
@@ -75,6 +75,8 @@ public abstract class Filesystem {
 	abstract boolean recursiveRemoveFileAtLocalURL(LocalFilesystemURL inputURL) throws FileExistsException, NoModificationAllowedException;
 
 	abstract JSONArray readEntriesAtLocalURL(LocalFilesystemURL inputURL) throws FileNotFoundException;
+	
+	abstract JSONArray readFilteredEntriesAtLocalURL(LocalFilesystemURL inputURL,JSONObject options) throws FileNotFoundException; //SIDMODIF
 
 	abstract JSONObject getFileMetadataForLocalURL(LocalFilesystemURL inputURL) throws FileNotFoundException;
 

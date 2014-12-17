@@ -153,7 +153,7 @@ public class LocalFilesystem extends Filesystem {
 	@Override
 	public JSONObject getFileForLocalURL(LocalFilesystemURL inputURL,
 			String path, JSONObject options, boolean directory) throws FileExistsException, IOException, TypeMismatchException, EncodingException, JSONException {
-        boolean create = false;
+		boolean create = false;
         boolean exclusive = false;
 
         if (options != null) {
@@ -209,7 +209,7 @@ public class LocalFilesystem extends Filesystem {
 
         // Return the directory
         return makeEntryForPath(requestedURL.fullPath, requestedURL.filesystemName, directory, Uri.fromFile(fp).toString());
-	}
+	}//END FONCTION 
 
 	@Override
 	public boolean removeFileAtLocalURL(LocalFilesystemURL inputURL) throws InvalidModificationException {
@@ -243,6 +243,56 @@ public class LocalFilesystem extends Filesystem {
             return true;
         }
 	}
+
+	@Override
+	public JSONArray readFilteredEntriesAtLocalURL(LocalFilesystemURL inputURL,JSONObject options) throws FileNotFoundException {
+        File fp = new File(filesystemPathForURL(inputURL));
+	long start_time=0;
+	long end_time = 1599999999;
+
+JSONObject debug;
+
+	//SIDMODIF
+	if(options != null){
+	start_time = options.optLong("start_time");
+	end_time = options.optLong("end_time");
+	
+	}
+
+        if (!fp.exists()) {
+            // The directory we are listing doesn't exist so we should fail.
+            throw new FileNotFoundException();
+        }
+
+        JSONArray entries = new JSONArray();
+System.out.println("coin");
+        if (fp.isDirectory()) {
+            File[] files = fp.listFiles();
+            for (int i = 0; i < files.length; i++) {
+                if (files[i].canRead()) {
+	        	    	try {
+					//DEBUG
+					/*
+debug= new JSONObject();
+debug.put("lm", String.valueOf(files[i].lastModified()));
+debug.put("start",String.valueOf(start_time));
+debug.put("end",String.valueOf(end_time));
+debug.put("options",options);
+					entries.put(debug);*/
+					///DEBUG
+
+		        if(files[i].lastModified() > start_time*1000 && files[i].lastModified() < end_time*1000){
+					entries.put(makeEntryForPath(fullPathForFilesystemPath(files[i].getAbsolutePath()), inputURL.filesystemName, files[i].isDirectory(), Uri.fromFile(files[i]).toString()));
+			}
+				} catch (JSONException e) {
+				}
+		}
+            }
+        }
+
+        return entries;
+	}
+
 
 	@Override
 	public JSONArray readEntriesAtLocalURL(LocalFilesystemURL inputURL) throws FileNotFoundException {
