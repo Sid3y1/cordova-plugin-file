@@ -265,27 +265,21 @@ JSONObject debug;
         }
 
         JSONArray entries = new JSONArray();
-System.out.println("coin");
+	JSONObject original = new JSONObject();
+
+	System.out.println("coin");
         if (fp.isDirectory()) {
             File[] files = fp.listFiles();
             for (int i = 0; i < files.length; i++) {
                 if (files[i].canRead()) {
-	        	    	try {
-					//DEBUG
-					/*
-debug= new JSONObject();
-debug.put("lm", String.valueOf(files[i].lastModified()));
-debug.put("start",String.valueOf(start_time));
-debug.put("end",String.valueOf(end_time));
-debug.put("options",options);
-					entries.put(debug);*/
-					///DEBUG
-
-		        if(files[i].lastModified() > start_time*1000 && files[i].lastModified() < end_time*1000){
-					entries.put(makeEntryForPath(fullPathForFilesystemPath(files[i].getAbsolutePath()), inputURL.filesystemName, files[i].isDirectory(), Uri.fromFile(files[i]).toString()));
-			}
-				} catch (JSONException e) {
+        	    	try {
+				if(files[i].lastModified() > start_time*1000 && files[i].lastModified() < end_time*1000){
+					original = makeEntryForPath(fullPathForFilesystemPath(files[i].getAbsolutePath()), inputURL.filesystemName, files[i].isDirectory(), Uri.fromFile(files[i]).toString());
+					original.put("lastModifiedDate",files[i].lastModified());
+					entries.put(original);
 				}
+			} catch (JSONException e) {
+			}
 		}
             }
         }

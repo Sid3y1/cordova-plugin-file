@@ -60,6 +60,8 @@ DirectoryReader.prototype.readFilteredEntries = function(successCallback, errorC
             entry.fullPath = result[i].fullPath;
             entry.filesystem = new (require('./FileSystem'))(result[i].filesystemName);
             entry.nativeURL = result[i].nativeURL;
+	    entry.lastModifiedDate = parseInt(result[i].lastModifiedDate/1000); //Added to avoid calling other stuff
+	    entry.fileName = result[i].name; //Compatibility
             retVal.push(entry);
         }
         reader.hasReadEntries = true;
